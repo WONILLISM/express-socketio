@@ -1,18 +1,28 @@
 import express, { Express, Request, Response } from "express";
-
-const app: Express = express();
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 const PORT = 4000;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("hello!!");
+const app: Express = express();
+
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+  },
 });
 
-app.listen(`${PORT}`, () => {
+io.on("connection", (socket) => {
+  console.log(socket.id, "was connected");
+});
+
+httpServer.listen(PORT, () => {
   console.log(`
-  ################################################
-       🛡️  Server listening on port: ${PORT}🛡️
-  ################################################
-  
-  `);
+################################################
+     🛡️  Server listening on port: ${PORT}🛡️
+################################################
+
+`);
 });
