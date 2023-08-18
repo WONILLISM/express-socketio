@@ -31,7 +31,6 @@ const io = new Server<
 });
 
 const rooms: Rooms = {};
-const messages: Messages = [];
 
 io.on("connection", (socket) => {
   console.log(socket.id, "was connected");
@@ -45,29 +44,40 @@ io.on("connection", (socket) => {
 
     rooms[roomId] = room;
 
-    socket.emit("ROOM_LIST", rooms);
+    io.emit("ROOM_LIST", rooms);
+  });
+
+  socket.on("JOIN_ROOM", (roomId: string) => {
+    console.log("join room");
 
     socket.join(roomId);
 
-    socket.emit("JOINED_ROOM", roomId);
+    io.emit("JOINED_ROOM", roomId);
   });
 
-  socket.on("JOIN_ROOM", (room: Room) => {
-    console.log("join room");
-  });
+  socket.on(
+    "SEND_CELB_MESSAGE",
+    ({ roomId, message }: { roomId: string; message: Message }) => {
+      console.log(
+        `${roomId}: ${message.username} send message: ${message.content}`
+      );
 
-  socket.on("SEND_CELB_MESSAGE", (message: Message) => {
-    console.log(`${message.username} send message: ${message.content}`);
-    messages.push(message);
+      // socket.to(roomId).emit("RECIEVED_CELB_MESSAGE", message);
+      io.to(roomId).emit("RECIEVED_CELB_MESSAGE", message);
+    }
+  );
 
-    socket.emit("RECIEVED_CELB_MESSAGE", message);
-  });
+  socket.on(
+    "SEND_FAN_MESSAGE",
+    ({ roomId, message }: { roomId: string; message: Message }) => {
+      console.log(
+        `${roomId}: ${message.username} send message: ${message.content}`
+      );
 
-  socket.on("SEND_FAN_MESSAGE", (data: Message) => {
-    console.log(`${data.username} send message: ${data.content}`);
-
-    socket.emit("RECIEVED_FAN_MESSAGE", data);
-  });
+      // socket.to(roomId).emit("RECIEVED_CELB_MESSAGE", message);
+      io.to(roomId).emit("RECIEVED_FAN_MESSAGE", message);
+    }
+  );
 
   socket.on("disconnect", () => {
     console.log("A client disconnected.");

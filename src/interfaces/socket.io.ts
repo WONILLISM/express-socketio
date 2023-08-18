@@ -14,15 +14,15 @@
 export interface ServerToClientEvents {
   ROOM_LIST: (rooms: Rooms) => void;
   JOINED_ROOM: (roomId: string) => void;
-  RECIEVED_CELB_MESSAGE: (data: SocketData) => void;
-  RECIEVED_FAN_MESSAGE: (data: SocketData) => void;
+  RECIEVED_CELB_MESSAGE: (message: Message) => void;
+  RECIEVED_FAN_MESSAGE: (message: Message) => void;
 }
 
 export interface ClientToServerEvents {
   CREATE_ROOM: ({ title }: { title: string }) => void;
-  JOIN_ROOM: (room: Room) => void;
-  SEND_CELB_MESSAGE: (data: SocketData) => void;
-  SEND_FAN_MESSAGE: (data: SocketData) => void;
+  JOIN_ROOM: (roomId: string) => void;
+  SEND_CELB_MESSAGE: (data: { roomId: string; message: Message }) => void;
+  SEND_FAN_MESSAGE: (data: { roomId: string; message: Message }) => void;
 }
 
 export interface InterServerEvents {}
